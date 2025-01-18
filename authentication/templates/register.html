@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .input-group-append .btn {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        .toggle-password {
+            cursor: pointer;
+        }
+        .toggle-password:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <form class="col-6 mx-auto card p-3 shadow-lg" method="post" enctype="multipart/form-data">
+            <h1 style="text-align: center;"><span style="color: green;">BumpAi</span></h1>
+
+            {% csrf_token %}
+
+            <h3>Register</h3>
+            <hr>
+
+            {% if messages %}
+            <div class="alert alert-primary" role="alert">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Added First Name field -->
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" class="form-control" name="first_name" id="firstName" 
+                    placeholder="Enter first name" required>
+            </div>
+
+            <!-- Added Last Name field -->
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" class="form-control" name="last_name" id="lastName" 
+                    placeholder="Enter last name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" name="username" id="username" 
+                    placeholder="Enter username" required>
+            </div>
+
+            <!-- Added Email field -->
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" name="email" id="email" 
+                    placeholder="Enter email" required>
+            </div>
+
+            <!-- Password field with strength indicator and show/hide -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <input type="password" name="password" class="form-control" id="password" 
+                        placeholder="Password" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="password-strength" class="mt-2">
+                    <div class="progress" style="height: 5px;">
+                        <div id="password-strength-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small id="password-strength-text" class="form-text"></small>
+                </div>
+                <div id="password-requirements" class="mt-2">
+                    <small class="form-text">Password must:</small>
+                    <ul class="list-unstyled">
+                        <li><small id="length-check" class="form-text text-muted">✗ Be 8-30 characters long</small></li>
+                        <li><small id="uppercase-check" class="form-text text-muted">✗ Contain at least one uppercase letter</small></li>
+                        <li><small id="lowercase-check" class="form-text text-muted">✗ Contain at least one lowercase letter</small></li>
+                        <li><small id="number-check" class="form-text text-muted">✗ Contain at least one number</small></li>
+                        <li><small id="special-check" class="form-text text-muted">✗ Contain at least one special character</small></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Password Confirmation field with show/hide -->
+            <div class="form-group">
+                <label for="password2">Confirm Password</label>
+                <div class="input-group">
+                    <input type="password" name="password2" class="form-control" id="password2" 
+                        placeholder="Confirm password" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password2">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <p>Already have an account? <a href="/login/">Login</a></p>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+
+                // Toggle the password visibility
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            let strength = 0;
+            let feedback = [];
+            
+            // Update requirements checks
+            document.getElementById('length-check').innerHTML = 
+                `${password.length >= 8 && password.length <= 30 ? '✓' : '✗'} Be 8-30 characters long`;
+            document.getElementById('uppercase-check').innerHTML = 
+                `${/[A-Z]/.test(password) ? '✓' : '✗'} Contain at least one uppercase letter`;
+            document.getElementById('lowercase-check').innerHTML = 
+                `${/[a-z]/.test(password) ? '✓' : '✗'} Contain at least one lowercase letter`;
+            document.getElementById('number-check').innerHTML = 
+                `${/[0-9]/.test(password) ? '✓' : '✗'} Contain at least one number`;
+            document.getElementById('special-check').innerHTML = 
+                `${/[!@#$%^&*(),.?":{}|<>]/.test(password) ? '✓' : '✗'} Contain at least one special character`;
+        
+            // Calculate strength
+            if (password.length >= 8) strength += 20;
+            if (password.length >= 12) strength += 10;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 20;
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 20;
+        
+            // Update strength bar
+            const strengthBar = document.getElementById('password-strength-bar');
+            strengthBar.style.width = `${strength}%`;
+            
+            // Update color based on strength
+            if (strength < 40) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText = 'Weak';
+            } else if (strength < 70) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText = 'Moderate';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText = 'Strong';
+            }
+        
+            document.getElementById('password-strength-text').textContent = 
+                password ? `Password Strength: ${strengthText}` : '';
+        });
+    </script>
+</body>
+</html>
